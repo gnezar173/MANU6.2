@@ -34,14 +34,20 @@ export function useFactoryData() {
 
   // Listen for factory switches performed elsewhere (e.g. the sidebar
   // switcher). We poll localStorage because it is the shared signal channel
-  // used by useActiveFactory / setActiveFactoryId.
+  // used by useActiveFactory / setActiveFactoryId. The `storage` event only
+  // fires in *other* tabs, so we also dispatch a custom `mizan-factory-changed`
+  // event for same-tab updates.
   useEffect(() => {
     const check = () => {
       const current = getActiveFactoryId();
       setFactoryId((prev) => (prev !== current ? current : prev));
     };
     window.addEventListener('storage', check);
-    return () => window.removeEventListener('storage', check);
+    window.addEventListener('mizan-factory-changed', check);
+    return () => {
+      window.removeEventListener('storage', check);
+      window.removeEventListener('mizan-factory-changed', check);
+    };
   }, []);
 
   return { bundle, loading, error, reload };
