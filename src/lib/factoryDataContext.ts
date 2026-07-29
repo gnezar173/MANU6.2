@@ -195,6 +195,13 @@ async function loadRealBundle(context: FactoryContext): Promise<FactoryDataBundl
     supabase.from('energy_records').select('*').eq('factory_id', factoryId).order('date', { ascending: true }),
   ]);
 
+  const queryErrors = [lines, products, machines, stages, materials, shifts, defects, downtime, energy]
+    .map((r) => r.error)
+    .filter(Boolean);
+  if (queryErrors.length > 0) {
+    throw new Error(queryErrors[0]?.message ?? 'فشل تحميل البيانات');
+  }
+
   return {
     context,
     profile: toFactoryProfile(context),

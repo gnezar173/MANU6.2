@@ -39,7 +39,7 @@ export default function FactorySetup() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <InfoCard icon={<Factory size={18} />} label="اسم المصنع" value={factoryProfile.nameAr} />
-          <InfoCard icon={<Layers size={18} />} label="الصناعة" value={factoryProfile.industry || 'خزانات مياه بلاستيكية'} />
+          <InfoCard icon={<Layers size={18} />} label="الصناعة" value={factoryProfile.industry || 'تصنيع'} />
           <InfoCard icon={<Users size={18} />} label="عدد الموظفين" value={`${factoryProfile.employees} موظف`} />
           <InfoCard icon={<Clock size={18} />} label="الورديات" value={`${factoryProfile.shifts} وردية`} />
           <InfoCard icon={<Zap size={18} />} label="مصادر الطاقة" value={factoryProfile.powerSources.join('، ')} />

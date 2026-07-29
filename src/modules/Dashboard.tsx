@@ -10,7 +10,7 @@ import { useFactoryData } from '@/lib/useFactoryData';
 import { hasOperationalData } from '@/lib/factoryDataContext';
 import type { Recommendation } from '@/types';
 
-export default function Dashboard({ onNavigate }: { onNavigate: (key: 'analysis' | 'advisor' | 'report') => void }) {
+export default function Dashboard({ onNavigate }: { onNavigate: (key: 'analysis' | 'advisor' | 'report' | 'setup' | 'data') => void }) {
   const { bundle, loading } = useFactoryData();
 
   const data = bundle
@@ -86,12 +86,23 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: 'analysis'
     );
   }
 
+  if (!bundle) {
+    return (
+      <InsufficientDataState
+        title="لا يوجد مصنع بعد"
+        message="لم تقم بإنشاء مصنع بعد. ابدأ بإعداد بيانات مصنعك لتفعيل التحليل الذكي."
+        actionLabel="إعداد المصنع"
+        onAction={() => onNavigate('setup')}
+      />
+    );
+  }
+
   if (!hasOperationalData(bundle)) {
     return (
       <InsufficientDataState
         message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
         actionLabel="رفع بيانات التشغيل"
-        onAction={() => onNavigate('analysis')}
+        onAction={() => onNavigate('data')}
       />
     );
   }

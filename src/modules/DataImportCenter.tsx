@@ -125,6 +125,13 @@ export default function DataImportCenter() {
       }
       const count = await importRecords(factoryId, selectedType, rows);
       setImportedCount(count);
+      if (count === 0) {
+        setStep('import', 'error');
+        setErrorMessage('لم يتم استيراد أي سجل. تحقق من صحة البيانات أو من اتصال قاعدة البيانات.');
+        setImporting(false);
+        setCurrentStep(null);
+        return;
+      }
       setStep('import', 'completed');
 
       // Step 5: Send to MIZAN AI (placeholder — AI logic not modified this phase)
@@ -372,8 +379,8 @@ async function importRecords(factoryId: string, type: ImportDataType, rows: Pars
         );
         if (ok) count++;
       }
-    } catch {
-      // skip bad row, continue
+    } catch (err) {
+      console.error('Failed to import row:', row, err);
     }
   }
   return count;
