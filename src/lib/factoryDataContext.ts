@@ -61,6 +61,7 @@ export function setActiveFactoryId(id: string | null): void {
   try {
     if (id) localStorage.setItem(ACTIVE_FACTORY_KEY, id);
     else localStorage.removeItem(ACTIVE_FACTORY_KEY);
+    window.dispatchEvent(new Event('mizan-factory-changed'));
   } catch {
     // ignore storage failures
   }
