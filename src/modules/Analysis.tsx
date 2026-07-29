@@ -3,10 +3,12 @@ import { computeFactoryScore, computeKpis, generateFindings } from '@/lib/analys
 import { generateAIRecommendations, mapAIRecommendations } from '@/lib/intelligence';
 import { generateAIEvidence, generateActionTimeline } from '@/lib/saas-intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
 import type { Recommendation } from '@/types';
 import BarChart from '@/components/ui/BarChart';
 import LineChart from '@/components/ui/LineChart';
 import AIEvidencePanel from '@/components/ui/AIEvidencePanel';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 const severityConfig = {
   critical: { color: '#ef4444', bg: '#fef2f2', icon: <AlertCircle size={18} />, label: 'حرج' },
@@ -80,6 +82,14 @@ export default function Analysis() {
   const shiftData = bundle?.shiftData ?? [];
   const defectRecords = bundle?.defectRecords ?? [];
   const downtimeEvents = bundle?.downtimeEvents ?? [];
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
+      />
+    );
+  }
 
   const oeeData = machines.map((m) => ({
     label: m.nameAr.split(' ').slice(-1)[0],

@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { Brain, Target, Ruler, Search, Wrench, ShieldCheck, ArrowLeft, Sparkles, CheckCircle2, Clock } from 'lucide-react';
 import { generateAIRecommendations, generateDMAICStages, stagesToStatus } from '@/lib/intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
 import { supabase } from '@/lib/supabase';
 import { getActiveFactoryId } from '@/lib/factoryDataContext';
 import type { DMAICStage, DMAICStageData } from '@/types';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 const stageConfig: Record<DMAICStage, { labelAr: string; icon: React.ReactNode; color: string }> = {
   define: { labelAr: 'تعريف', icon: <Target size={20} />, color: '#0066FF' },
@@ -21,11 +23,28 @@ interface DMAICProps {
 export default function DMAICWorkflow({ onCreateProject }: DMAICProps) {
   const { bundle } = useFactoryData();
   const recs = generateAIRecommendations(bundle ?? undefined);
-  const [selectedRec, setSelectedRec] = useState(recs[0].id);
-  const [stages, setStages] = useState<DMAICStageData[]>(generateDMAICStages(recs[0].problem));
+  const [selectedRec, setSelectedRec] = useState(recs[0]?.id ?? '');
+  const [stages, setStages] = useState<DMAICStageData[]>(generateDMAICStages(recs[0]?.problem ?? ''));
   const [linkedProjectId, setLinkedProjectId] = useState<string | null>(null);
 
-  const rec = recs.find((r) => r.id === selectedRec)!;
+  const rec = recs.find((r) => r.id === selectedRec);
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
+      />
+    );
+  }
+
+  if (recs.length === 0 || !rec) {
+    return (
+      <InsufficientDataState
+        title="لا توجد مشاكل للتحليل"
+        message="لم يكتشف محرك التحليل أي مشاكل تستحق تحليل DMAIC في البيانات الحالية. قم برفع بيانات تشغيلية إضافية."
+      />
+    );
+  }
 
   // Load saved DMAIC stages for the selected recommendation from the database.
   // If a tracked project exists for this recommendation, its persisted stages

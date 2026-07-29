@@ -1,10 +1,21 @@
 import { Grid3x3, AlertCircle, TrendingUp, DollarSign, Cog, Clock } from 'lucide-react';
 import { generatePriorityMatrix, priorityConfig, urgencyConfig } from '@/lib/saas-intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
 import type { PriorityLevel } from '@/types';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 export default function PriorityMatrix() {
   const { bundle } = useFactoryData();
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
+      />
+    );
+  }
+
   const items = generatePriorityMatrix(bundle ?? undefined);
 
   const quadrants = [

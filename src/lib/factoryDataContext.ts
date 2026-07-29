@@ -294,6 +294,26 @@ async function loadRealBundle(context: FactoryContext): Promise<FactoryDataBundl
   };
 }
 
+/**
+ * Returns true when the bundle contains enough operational data for the AI
+ * analysis engines to produce meaningful results. When false, the UI should
+ * show an "insufficient data" empty state instead of falling back to demo
+ * data.
+ *
+ * We require at least one shift record OR one defect record OR one downtime
+ * event — any of these proves the factory has started importing real
+ * operational data. Machines/products/lines alone are configuration, not
+ * operational history.
+ */
+export function hasOperationalData(bundle: FactoryDataBundle | null): boolean {
+  if (!bundle) return false;
+  return (
+    bundle.shiftData.length > 0 ||
+    bundle.defectRecords.length > 0 ||
+    bundle.downtimeEvents.length > 0
+  );
+}
+
 // =====================================================
 // Writes: insert real operational records
 // =====================================================

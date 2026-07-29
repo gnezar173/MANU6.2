@@ -2,10 +2,29 @@ import { FileText, Download, CheckCircle2, Clock, ArrowLeft, TrendingUp, AlertCi
 import { computeFactoryScore, computeKpis } from '@/lib/analysis';
 import { generateAIRecommendations, mapAIRecommendations, generateFinancialImpact } from '@/lib/intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
 import type { Recommendation } from '@/types';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 export default function Report({ onNavigate }: { onNavigate: (key: 'advisor') => void }) {
   const { bundle, loading } = useFactoryData();
+
+  if (loading) {
+    return (
+      <div className="card p-12 flex items-center justify-center">
+        <Loader2 size={24} className="animate-spin text-aiblue-600" />
+      </div>
+    );
+  }
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
+      />
+    );
+  }
+
   const recs: Recommendation[] = mapAIRecommendations(generateAIRecommendations(bundle ?? undefined));
   const score = computeFactoryScore(bundle ?? undefined);
   const kpis = computeKpis(bundle ?? undefined);

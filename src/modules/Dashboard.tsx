@@ -1,15 +1,17 @@
-import { Activity, Gauge, ShieldCheck, AlertTriangle, Trash2, Zap, Wrench, Sparkles, ArrowLeft } from 'lucide-react';
+import { Activity, Gauge, ShieldCheck, AlertTriangle, Trash2, Zap, Wrench, Sparkles, ArrowLeft, Loader2 } from 'lucide-react';
 import ScoreGauge from '@/components/ui/ScoreGauge';
 import KpiCard from '@/components/ui/KpiCard';
 import LineChart from '@/components/ui/LineChart';
 import BarChart from '@/components/ui/BarChart';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 import { computeKpis, computeFactoryScore } from '@/lib/analysis';
 import { generateAIRecommendations, mapAIRecommendations } from '@/lib/intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
 import type { Recommendation } from '@/types';
 
 export default function Dashboard({ onNavigate }: { onNavigate: (key: 'analysis' | 'advisor' | 'report') => void }) {
-  const { bundle } = useFactoryData();
+  const { bundle, loading } = useFactoryData();
 
   const data = bundle
     ? {
@@ -75,6 +77,24 @@ export default function Dashboard({ onNavigate }: { onNavigate: (key: 'analysis'
     <Zap size={20} />,
     <Wrench size={20} />,
   ];
+
+  if (loading) {
+    return (
+      <div className="card p-12 flex items-center justify-center">
+        <Loader2 size={24} className="animate-spin text-aiblue-600" />
+      </div>
+    );
+  }
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
+        actionLabel="رفع بيانات التشغيل"
+        onAction={() => onNavigate('analysis')}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">

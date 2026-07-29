@@ -1,10 +1,22 @@
 import { TrendingUp, TrendingDown, DollarSign, Gauge, Target, Award, ArrowLeft, ArrowRight } from 'lucide-react';
 import { generateImpactScore } from '@/lib/saas-intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
 import ScoreGauge from '@/components/ui/ScoreGauge';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 export default function ImpactScore() {
   const { bundle } = useFactoryData();
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        title="مؤشر الأثر غير متاح"
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لحساب مؤشر أثر MIZAN."
+      />
+    );
+  }
+
   const impact = generateImpactScore(bundle ?? undefined);
 
   const metrics = [

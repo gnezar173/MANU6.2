@@ -1,9 +1,20 @@
 import { DollarSign, TrendingDown, TrendingUp, ArrowLeft, ArrowRight, Calculator } from 'lucide-react';
 import { generateFinancialImpact, generateBeforeAfterComparison } from '@/lib/intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 export default function FinancialImpact() {
   const { bundle } = useFactoryData();
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
+      />
+    );
+  }
+
   const items = generateFinancialImpact(bundle ?? undefined);
   const comparison = generateBeforeAfterComparison(bundle ?? undefined);
 

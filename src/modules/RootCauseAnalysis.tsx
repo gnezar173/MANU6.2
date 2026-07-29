@@ -1,14 +1,28 @@
 import { useState } from 'react';
-import { Search, GitBranch, Fish, ArrowLeft, ArrowRight, Sparkles, Target } from 'lucide-react';
+import { Search, GitBranch, Fish, ArrowLeft, ArrowRight, Sparkles, Target, Database } from 'lucide-react';
 import {
   generateFiveWhyAnalysis,
   generateFishboneAnalysis,
   getAllFiveWhyProblems,
 } from '@/lib/intelligence';
+import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 export default function RootCauseAnalysis() {
+  const { bundle } = useFactoryData();
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        title="تحليل السبب الجذري غير متاح"
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء تحليل السبب الجذري."
+      />
+    );
+  }
+
   const problems = getAllFiveWhyProblems();
-  const [selectedProblem, setSelectedProblem] = useState(problems[0].id);
+  const [selectedProblem, setSelectedProblem] = useState(problems[0]?.id ?? '');
   const [view, setView] = useState<'5why' | 'fishbone'>('5why');
 
   const fiveWhy = generateFiveWhyAnalysis(selectedProblem);

@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, User, Activity, ShieldCheck, Wrench, Zap, Trash2, TrendingUp } from 'lucide-react';
+import { Send, Sparkles, User, Activity, ShieldCheck, Wrench, Zap, Trash2, TrendingUp, Database } from 'lucide-react';
 import { generateIntelligentAdvisorResponse } from '@/lib/intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 interface Message {
   id: string;
@@ -20,6 +22,16 @@ const suggestedQuestions = [
 
 export default function Advisor() {
   const { bundle } = useFactoryData();
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        title="المستشار الذكي غير متاح"
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التفاعل مع المستشار الذكي."
+      />
+    );
+  }
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',

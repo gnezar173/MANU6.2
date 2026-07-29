@@ -1,8 +1,22 @@
 import { Database, AlertCircle, CheckCircle2, TrendingUp, Activity } from 'lucide-react';
 import { generateDataQualityScore } from '@/lib/saas-intelligence';
 import ScoreGauge from '@/components/ui/ScoreGauge';
+import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 export default function DataQuality() {
+  const { bundle } = useFactoryData();
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        title="جودة البيانات غير متاحة"
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لقياس جودة البيانات."
+      />
+    );
+  }
+
   const dq = generateDataQualityScore();
 
   const categories = [

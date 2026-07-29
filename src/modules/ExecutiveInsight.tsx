@@ -1,10 +1,21 @@
 import { Sparkles, AlertCircle, TrendingUp, DollarSign, Target, ArrowLeft, Crown } from 'lucide-react';
 import { generateExecutiveInsight } from '@/lib/intelligence';
 import { useFactoryData } from '@/lib/useFactoryData';
+import { hasOperationalData } from '@/lib/factoryDataContext';
 import ScoreGauge from '@/components/ui/ScoreGauge';
+import InsufficientDataState from '@/components/ui/InsufficientDataState';
 
 export default function ExecutiveInsight({ onNavigate }: { onNavigate: (key: string) => void }) {
   const { bundle } = useFactoryData();
+
+  if (!hasOperationalData(bundle)) {
+    return (
+      <InsufficientDataState
+        message="لا توجد بيانات تشغيل كافية لهذا المصنع. قم برفع بيانات الإنتاج والجودة لبدء التحليل الذكي."
+      />
+    );
+  }
+
   const insight = generateExecutiveInsight(bundle ?? undefined);
 
   const priorityConfig: Record<string, { color: string; bg: string; label: string }> = {
