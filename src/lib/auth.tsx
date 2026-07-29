@@ -121,6 +121,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (profileError) return { error: 'فشل إنشاء الملف الشخصي' };
 
+    const p = await loadProfile(user.id);
+    setProfile(p);
+    setLoading(false);
+
     return { error: null };
   };
 
